@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A0E27;
+            --accent: #FF6B35;
+            --accent-light: #FF8C61;
+            --bg: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text: #1A1D2E;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .search-section {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            animation: fadeInUp 0.6s ease-out 0.2s backwards;
+        }
+
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .keyword-input {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            font-size: 1.125rem;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            font-family: 'Work Sans', sans-serif;
+            transition: all 0.3s ease;
+            background: var(--bg);
+        }
+
+        .keyword-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            font-family: 'Syne', sans-serif;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+        }
+
+        .generate-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        .generate-btn.loading .loading-spinner {
+            display: block;
+        }
+
+        .generate-btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            font-weight: 500;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .status-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            display: block;
+        }
+
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+            display: block;
+        }
+
+        .results-section {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .results-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .results-count {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.75rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s ease;
+            animation: scaleIn 0.4s ease-out backwards;
+            border: 2px solid transparent;
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+            border-color: var(--accent-light);
+        }
+
+        .result-card:nth-child(1) { animation-delay: 0.1s; }
+        .result-card:nth-child(2) { animation-delay: 0.15s; }
+        .result-card:nth-child(3) { animation-delay: 0.2s; }
+        .result-card:nth-child(4) { animation-delay: 0.25s; }
+        .result-card:nth-child(5) { animation-delay: 0.3s; }
+
+        .platform-tag {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .platform-tag.blog {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+        }
+
+        .platform-tag.twitter {
+            background: rgba(29, 155, 240, 0.1);
+            color: #1D9BF0;
+        }
+
+        .platform-tag.linkedin {
+            background: rgba(10, 102, 194, 0.1);
+            color: #0A66C2;
+        }
+
+        .platform-tag.instagram {
+            background: linear-gradient(135deg, rgba(131, 58, 180, 0.1) 0%, rgba(253, 29, 29, 0.1) 50%, rgba(252, 176, 69, 0.1) 100%);
+            color: #C13584;
+        }
+
+        .platform-tag.facebook {
+            background: rgba(24, 119, 242, 0.1);
+            color: #1877F2;
+        }
+
+        .result-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .result-content {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-weight: 600;
+            font-family: 'Work Sans', sans-serif;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .search-section {
+                padding: 1.5rem;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Content Generator</h1>
+            <p class="subtitle">Transform keywords into multi-platform content instantly</p>
+        </header>
+
+        <div class="search-section">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    class="keyword-input" 
+                    id="keywordInput" 
+                    placeholder="Enter your keyword or topic..."
+                    autocomplete="off"
+                >
+            </div>
+            <button class="generate-btn" id="generateBtn">
+                <span class="btn-text">Generate Content</span>
+                <div class="loading-spinner"></div>
+            </button>
+            <div class="status-message" id="statusMessage"></div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h2 class="results-title">Generated Content</h2>
+                <span class="results-count" id="resultsCount">5 Results</span>
+            </div>
+            <div class="results-grid" id="resultsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // CONFIGURATION - Update with your n8n webhook URL
+        // ========================================
+        const N8N_WEBHOOK_URL = 'https://your-n8n-instance.com/webhook/content-repurpose';
+        
+        // Note: Replace the URL above with your actual n8n webhook URL
+        // Example: 'https://your-domain.app.n8n.cloud/webhook/content-repurpose'
+
+        // ========================================
+        // DOM Elements
+        // ========================================
+        const keywordInput = document.getElementById('keywordInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const resultsCount = document.getElementById('resultsCount');
+
+        // ========================================
+        // Event Listeners
+        // ========================================
+        generateBtn.addEventListener('click', handleGenerate);
+        keywordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleGenerate();
+        });
+
+        // ========================================
+        // Main Generate Function
+        // ========================================
+        async function handleGenerate() {
+            const keyword = keywordInput.value.trim();
+            
+            if (!keyword) {
+                showStatus('Please enter a keyword', 'error');
+                return;
+            }
+
+            // Update UI to loading state
+            generateBtn.disabled = true;
+            generateBtn.classList.add('loading');
+            statusMessage.classList.remove('success', 'error');
+            statusMessage.style.display = 'none';
+            resultsSection.classList.remove('visible');
+
+            try {
+                // Send request to n8n webhook - matching your workflow structure
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: {
+                            keyword: keyword
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Display results
+                displayResults(data, keyword);
+                showStatus('Content generated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Failed to generate content. Please try again.', 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('loading');
+            }
+        }
+
+        // ========================================
+        // Display Results Function
+        // ========================================
+        function displayResults(data, keyword) {
+            // Clear previous results
+            resultsGrid.innerHTML = '';
+
+            // Your n8n workflow returns data in this structure based on the Airtable save node:
+            // {
+            //   keyword: "...",
+            //   blog: "...",
+            //   x_thread: "...",
+            //   linkedin: "...",
+            //   facebook: "...",
+            //   instagram: "..."
+            // }
+
+            // Transform n8n response into display format
+            const results = [
+                {
+                    platform: 'Blog',
+                    title: `Complete Guide: ${keyword}`,
+                    content: data.blog || 'Content generation in progress...',
+                    wordCount: countWords(data.blog || ''),
+                    rawContent: data.blog
+                },
+                {
+                    platform: 'Twitter',
+                    title: 'Twitter/X Thread',
+                    content: data.x_thread || 'Content generation in progress...',
+                    charCount: (data.x_thread || '').length,
+                    rawContent: data.x_thread
+                },
+                {
+                    platform: 'LinkedIn',
+                    title: 'LinkedIn Post',
+                    content: data.linkedin || 'Content generation in progress...',
+                    charCount: (data.linkedin || '').length,
+                    rawContent: data.linkedin
+                },
+                {
+                    platform: 'Facebook',
+                    title: 'Facebook Post',
+                    content: data.facebook || 'Content generation in progress...',
+                    charCount: (data.facebook || '').length,
+                    rawContent: data.facebook
+                },
+                {
+                    platform: 'Instagram',
+                    title: 'Instagram Caption',
+                    content: data.instagram || 'Content generation in progress...',
+                    charCount: (data.instagram || '').length,
+                    rawContent: data.instagram
+                }
+            ];
+            
+            // Update count
+            resultsCount.textContent = `${results.length} Results`;
+
+            // Create cards for each result
+            results.forEach((result, index) => {
+                const card = createResultCard(result, index);
+                resultsGrid.appendChild(card);
+            });
+
+            // Show results section
+            resultsSection.classList.add('visible');
+        }
+
+        // ========================================
+        // Count Words Helper
+        // ========================================
+        function countWords(text) {
+            if (!text) return 0;
+            return text.trim().split(/\s+/).length;
+        }
+
+        // ========================================
+        // Create Result Card
+        // ========================================
+        function createResultCard(result, index) {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+
+            const platformClass = result.platform.toLowerCase();
+            const metricValue = result.wordCount || result.charCount || 0;
+            const metricLabel = result.wordCount ? 'words' : 'characters';
+
+            // Truncate content for preview
+            const preview = result.content.length > 300 
+                ? result.content.substring(0, 300) + '...' 
+                : result.content;
+
+            card.innerHTML = `
+                <span class="platform-tag ${platformClass}">${result.platform}</span>
+                <h3 class="result-title">${escapeHtml(result.title)}</h3>
+                <p class="result-content">${escapeHtml(preview)}</p>
+                <div class="result-meta">
+                    <span class="meta-item">
+                        📊 ${metricValue} ${metricLabel}
+                    </span>
+                    <span class="meta-item">
+                        ⏱️ Just now
+                    </span>
+                </div>
+                <button class="copy-btn" onclick="copyContent(${index})">
+                    Copy to Clipboard
+                </button>
+            `;
+
+            // Store full content in data attribute for copying
+            card.dataset.fullContent = result.rawContent || result.content;
+
+            return card;
+        }
+
+        // ========================================
+        // Copy Content Function
+        // ========================================
+        window.copyContent = function(index) {
+            const cards = document.querySelectorAll('.result-card');
+            const card = cards[index];
+            const content = card.dataset.fullContent;
+
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = card.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.style.background = 'var(--success)';
+                btn.style.color = 'white';
+                btn.style.borderColor = 'var(--success)';
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                showStatus('Failed to copy to clipboard', 'error');
+            });
+        };
+
+        // ========================================
+        // Show Status Message
+        // ========================================
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+        }
+
+        // ========================================
+        // Utility: Escape HTML
+        // ========================================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
