@@ -465,10 +465,9 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
-                
-                // Display results
-                displayResults(data, keyword);
+              const responseData = await response.json();
+const data = Array.isArray(responseData) ? responseData[0] : responseData;
+displayResults(data, keyword);;
                 showStatus('Content generated successfully!', 'success');
                 
             } catch (error) {
