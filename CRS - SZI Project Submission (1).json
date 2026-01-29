@@ -1,0 +1,734 @@
+{
+  "name": "CRS - SZI Project Submission",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "=content-repurpose",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2688,
+        -64
+      ],
+      "id": "7dd17d19-6639-43f3-869a-e591e126cf23",
+      "name": "Webhook",
+      "webhookId": "93da3123-53bb-4f43-9dea-601de82864f6"
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "appXaR7JexDk95G25",
+          "mode": "list",
+          "cachedResultName": "n8n CRS",
+          "cachedResultUrl": "https://airtable.com/appXaR7JexDk95G25"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbloPDynLeZkAkXZ8",
+          "mode": "list",
+          "cachedResultName": "Company_Profile",
+          "cachedResultUrl": "https://airtable.com/appXaR7JexDk95G25/tbloPDynLeZkAkXZ8"
+        },
+        "id": "recASFmhlmuU14nM0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -2240,
+        -64
+      ],
+      "id": "2608381c-3f1c-4c57-b7da-150ecdd9a9ff",
+      "name": "Get Company Profile",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "bpb9m2OXw97R5h0C",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a senior SEO content strategist writing for a real consulting brand.\nWrite content that is practical, clear, and based on real SEO experience.\nAvoid hype, exaggerated promises, and generic AI phrasing.\nUse a calm, teaching-first tone.\nWrite for humans first."
+            },
+            {
+              "content": "=Write a complete, high-quality blog post using the information below.\n\nKeyword:\n{{ $('Set – Keyword Fix').item.json.keyword }}\n\nCompany Context:\n{{ $('Set – Company Knowledge Block').item.json.company_knowledge }}\n\nContent rules:\n- Explain the topic step by step\n- Use clear H2 and H3 headings\n- Keep paragraphs short and readable\n- Be practical and example-driven\n- Do not use emojis\n- Do not add meta commentary"
+            }
+          ]
+        },
+        "simplify": false,
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 200,
+          "textFormat": {
+            "textOptions": {
+              "type": "text"
+            }
+          },
+          "temperature": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -1792,
+        -64
+      ],
+      "id": "d73a92ff-22d5-4ff4-9f15-bdb6ae0d696f",
+      "name": "AI - Blog Generator",
+      "credentials": {
+        "openAiApi": {
+          "id": "R0KO9rVZ7mm9l4gQ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86f9c2a7-ec9c-4df3-b2c8-5570f1a2915b",
+              "name": "company_knowledge",
+              "value": "=Company Name: {{$json.company_name}}\n\nAbout:\n{{$json.about_company}}\n\nServices:\n{{$json.services}}\n\nTarget Audience:\n{{$json.target_audience}}\n\nTone:\n{{$json.tone}}\n\nPositioning:\n{{$json.positioning}}\n\nGeo Focus:\n{{$json.geo_focus}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2016,
+        -64
+      ],
+      "id": "643ebe4a-bba4-46bf-af9b-c2a3f44989c4",
+      "name": "Set – Company Knowledge Block"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9cd6afc7-3e7c-4b4a-a7bb-47245d22e5f7",
+              "name": "blog_content",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1440,
+        -64
+      ],
+      "id": "c4504e04-e1c2-4133-9235-3273416a9262",
+      "name": "Set – Store Blog"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You write Facebook posts that are educational and conversational.\nTone is friendly, clear, and practical.\nAvoid hype, clickbait, and salesy language."
+            },
+            {
+              "content": "=Write a Facebook post using the blog content below.\n\nBlog Content:\n{{$item(0).$node[\"Set – Store Blog\"].json.blog_content }}\n\nGuidelines:\n- Conversational and easy to read\n- Short paragraphs\n- Explain the core idea simply\n- Educational, not promotional\n- No emojis"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -1216,
+        32
+      ],
+      "id": "3e497e6e-d2e4-4d90-b6bd-b4eff2ec9976",
+      "name": "AI – Facebook Post",
+      "credentials": {
+        "openAiApi": {
+          "id": "R0KO9rVZ7mm9l4gQ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Using the blog content below, write a Twitter (X) thread.\n\nBlog Content:\n{{ $node[\"Set – Store Blog\"].json.blog_content }}\n\nGuidelines:\n- 6 to 8 tweets\n- Each tweet should deliver one clear idea\n- First tweet should be a strong hook\n- Educational, not promotional\n- No emojis"
+            },
+            {
+              "role": "system",
+              "content": "You are an SEO professional writing educational Twitter threads.\nYour writing is concise, clear, and value-focused.\nAvoid hype and exaggerated claims."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 16
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -1216,
+        -352
+      ],
+      "id": "69b99550-68c6-4e9c-a3df-a96c40bad76b",
+      "name": "AI – X Thread",
+      "credentials": {
+        "openAiApi": {
+          "id": "R0KO9rVZ7mm9l4gQ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You write LinkedIn posts for founders, consultants, and marketers.\nTone is professional, practical, and experience-based.\nFocus on clarity and insight, not motivation or hype."
+            },
+            {
+              "role": "system",
+              "content": "=Create a LinkedIn post using the blog content below.\n\nBlog Content:\n{{ $node[\"Set – Store Blog\"].json.blog_content }}\n\nGuidelines:\n- Start with a strong hook\n- Explain the idea clearly in short paragraphs\n- Keep it educational"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -1216,
+        -160
+      ],
+      "id": "c46ad236-2a7b-4328-a66f-4577aeaa9b96",
+      "name": "AI – Linkedin Post",
+      "credentials": {
+        "openAiApi": {
+          "id": "R0KO9rVZ7mm9l4gQ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Create an Instagram caption using the blog content below.\n\nBlog Content:\n{{ $node[\"Set – Store Blog\"].json.blog_content }}\n\nGuidelines:\n- Short paragraphs (1–2 lines)\n- Clear takeaway for the reader\n- Educational, not promotional\n- No hashtags\n- No emojis"
+            },
+            {
+              "role": "system",
+              "content": "=You write Instagram captions that are clear, concise, and educational.\nTone is practical and human, not salesy.\nFocus on delivering value quickly. Add 3 hashtags relevant to the post"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -1216,
+        224
+      ],
+      "id": "3a0b5043-b509-48ec-ad5c-702db95281ac",
+      "name": "AI – Instagram Post",
+      "credentials": {
+        "openAiApi": {
+          "id": "R0KO9rVZ7mm9l4gQ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appXaR7JexDk95G25",
+          "mode": "list",
+          "cachedResultName": "n8n CRS",
+          "cachedResultUrl": "https://airtable.com/appXaR7JexDk95G25"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3Icypbjq4tCJbu",
+          "mode": "list",
+          "cachedResultName": "Keywords_Content",
+          "cachedResultUrl": "https://airtable.com/appXaR7JexDk95G25/tbl3Icypbjq4tCJbu"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "used(checkbox)": true,
+            "keyword": "={{ $('Set – Keyword Fix').item.json.keyword }}",
+            "blog": "={{$item(0).$node[\"Set – Store Blog\"].json.blog_content }}",
+            "x_thread": "={{$item(0).$node[\"AI – X Thread\"].json.output[0].content[0].text }}",
+            "linkedin": "={{$item(0).$node[\"AI – Linkedin Post\"].json.output[0].content[0].text }}\n",
+            "facebook": "={{$item(0).$node[\"AI – Facebook Post\"].json.output[0].content[0].text }}",
+            "instagram": "={{$item(0).$node[\"AI – Instagram Post\"].json.output[0].content[0].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "used(checkbox)",
+              "displayName": "used(checkbox)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "blog",
+              "displayName": "blog",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "x_thread",
+              "displayName": "x_thread",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "linkedin",
+              "displayName": "linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "facebook",
+              "displayName": "facebook",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "instagram",
+              "displayName": "instagram",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -640,
+        -64
+      ],
+      "id": "2542d9dd-32d3-4554-ae58-3fd7f8f1e6bb",
+      "name": "Airtable – Save Final Content",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "bpb9m2OXw97R5h0C",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 4,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -864,
+        -96
+      ],
+      "id": "ec9f57e2-6172-41fb-afdc-df25674c0e57",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS, GET"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -192,
+        -64
+      ],
+      "id": "f32bc233-33b3-46e6-84e6-e0413c3b613e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8e720623-7577-45da-8da5-b0a80018b290",
+              "name": "keyword",
+              "value": "={{ $('Set – Keyword Fix').item.json.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "27f7dc81-913e-409e-b2e5-730a9f4e169a",
+              "name": "blog",
+              "value": "={{ $json.fields.blog }}",
+              "type": "string"
+            },
+            {
+              "id": "829988a5-65a1-44d3-82f8-0d14ef1769a5",
+              "name": "linkedin",
+              "value": "={{ $json.fields.linkedin }}",
+              "type": "string"
+            },
+            {
+              "id": "4e43a7ad-a1fb-44ad-b55e-707347356cb0",
+              "name": "x_thread",
+              "value": "={{ $json.fields.x_thread }}",
+              "type": "string"
+            },
+            {
+              "id": "e3d8cfe7-06e2-4127-90d8-c66cffff494c",
+              "name": "instagram",
+              "value": "={{ $json.fields.instagram }}",
+              "type": "string"
+            },
+            {
+              "id": "96c6a0c5-24cd-42a1-89dc-5153c93c5e87",
+              "name": "facebook",
+              "value": "={{ $json.fields.facebook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        -64
+      ],
+      "id": "ca87f4d0-f234-438c-a41b-58bacf0b797f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "57fd5b3a-e910-4677-b54d-35e053e14d1d",
+              "name": "keyword",
+              "value": "={{ $json.body.query.keyword }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2464,
+        -64
+      ],
+      "id": "132f0024-c69f-46ab-b6e9-fc0ac7465415",
+      "name": "Set – Keyword Fix"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set – Keyword Fix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Company Profile": {
+      "main": [
+        [
+          {
+            "node": "Set – Company Knowledge Block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set – Company Knowledge Block": {
+      "main": [
+        [
+          {
+            "node": "AI - Blog Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Blog Generator": {
+      "main": [
+        [
+          {
+            "node": "Set – Store Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set – Store Blog": {
+      "main": [
+        [
+          {
+            "node": "AI – X Thread",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI – Linkedin Post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI – Facebook Post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI – Instagram Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – Linkedin Post": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI – Instagram Post": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "AI – X Thread": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – Facebook Post": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Airtable – Save Final Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable – Save Final Content": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set – Keyword Fix": {
+      "main": [
+        [
+          {
+            "node": "Get Company Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "31eed791-fefe-49ab-9d66-a576ba842244",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4d055c5d5f979996299c60cf893bf564df5361b19d2c3a20f8b003e42f909526"
+  },
+  "id": "Xdsg-FcAOH71F3zyOmSfK",
+  "tags": []
+}
