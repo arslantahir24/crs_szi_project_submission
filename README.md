@@ -1,114 +1,158 @@
-# 🚀 Content Generator
+🚀 AI Content Repurposing System
 
-AI-powered multi-platform content generation tool that transforms a single keyword into professional content for 5 different platforms.
+An AI-powered content automation system that converts a single keyword into a full content ecosystem, including a blog post and platform-specific social media content. Built for scalability, brand consistency, and real-world production use.
 
-## ✨ Features
+**📌 Project Overview**
 
-- **📝 Blog Posts** - Complete, SEO-optimized articles
-- **🐦 Twitter Threads** - Engaging 6-8 tweet threads  
-- **💼 LinkedIn Posts** - Professional content for business audiences
-- **📘 Facebook Posts** - Conversational, shareable content
-- **📸 Instagram Captions** - Visual-first social media content
+This project automates the entire content repurposing workflow using n8n, OpenAI, Airtable, and a Vercel-hosted frontend.
 
-## 🎯 Live Demo
+Instead of manually rewriting content for different platforms, users enter one keyword through a web interface. The system then automatically generates a long-form blog and optimized social media posts for multiple platforms, stores them in Airtable, and returns the results to the frontend in real time.
 
-**[Try it here →](https://YOUR-USERNAME.github.io/content-generator/)**
+The primary goal is to eliminate manual content repurposing while maintaining brand awareness and platform-specific writing rules.
 
-## 🛠️ Tech Stack
+**Features**
 
-- **Frontend**: HTML, CSS, JavaScript (Vanilla)
-- **Automation**: n8n workflow
-- **AI**: OpenAI GPT-4o-mini
-- **Database**: Airtable
-- **Hosting**: GitHub Pages
+Single keyword input through a web-based UI
 
-## 📖 How It Works
+Automated generation of:
 
-1. Enter a keyword or topic
-2. Click "Generate Content"
-3. Wait 30-60 seconds for AI generation
-4. Get 5 pieces of platform-specific content
-5. Copy and use anywhere
+SEO-optimized blog post
 
-## 🚀 Quick Start
+X (Twitter) thread
 
-### For Users
+LinkedIn post
 
-Simply visit the [live site](https://YOUR-USERNAME.github.io/content-generator/) and start generating content!
+Facebook post
 
-### For Developers
+Instagram caption
 
-1. Clone this repository:
-```bash
-git clone https://github.com/YOUR-USERNAME/content-generator.git
-```
+Brand-aware content using a dynamic company profile
 
-2. Update the webhook URL in `index.html`:
-```javascript
-const N8N_WEBHOOK_URL = 'your-n8n-webhook-url';
-```
+Real-time content rendering on the frontend
 
-3. Open `index.html` in your browser
+Centralized content storage in Airtable
 
-## 🔧 Configuration
+Stable and scalable workflow using normalized data references
 
-The tool requires an n8n workflow with:
-- Webhook trigger endpoint
-- Company profile integration (Airtable)
-- AI content generation nodes
-- Response formatting
+**🏗️ System Architecture**
 
-See `SETUP_GUIDE.md` for detailed setup instructions.
+**High-level flow:**
 
-## 📱 Platforms Supported
+>User enters a keyword on the frontend
 
-| Platform | Content Type | Optimized For |
-|----------|-------------|---------------|
-| Blog | Long-form articles | SEO & readability |
-| Twitter/X | Threaded tweets | Engagement & viral reach |
-| LinkedIn | Professional posts | B2B & networking |
-| Facebook | Social updates | Sharing & conversation |
-| Instagram | Caption + hashtags | Visual storytelling |
+>Frontend sends the keyword to an n8n webhook
 
-## 🔒 Security
+>n8n normalizes input and fetches company context from Airtable
 
-- No sensitive data stored in frontend
-- Webhook handles authentication
-- Rate limiting on backend
-- HTTPS enabled
+>OpenAI generates blog and social media content
 
-## 📊 Features
+>All outputs are saved to Airtable
 
-- ✅ Clean, modern UI
-- ✅ Responsive design (mobile-friendly)
-- ✅ Real-time generation
-- ✅ One-click copy to clipboard
-- ✅ Character/word count display
-- ✅ Loading animations
-- ✅ Error handling
+>Final structured data is returned to the frontend
 
-## 🤝 Contributing
+>Frontend displays content in copy-ready cards
 
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
+💻 Tech Stack
 
-## 📄 License
+**Automation** : n8n
 
-MIT License - feel free to use this for your own projects!
+**AI**: OpenAI
 
-## 👨‍💻 Author
+**Database** : Airtable
 
-Created with ❤️ for efficient content creation
+**Frontend**:HTML, CSS, JavaScript
 
-## 🙏 Acknowledgments
+**Hosting**:Vercel
 
-- n8n for workflow automation
-- OpenAI for AI capabilities
-- Airtable for data storage
-- GitHub Pages for hosting
+**🧩 n8n Workflow Highlights**
 
----
+Webhook Node: Entry point for frontend requests
 
-**⭐ Star this repo if you find it useful!**
+Set Node: Normalizes keyword input for stable references
+
+Airtable Node: Fetches dynamic company profile data
+
+AI Blog Generator: Creates long-form content
+
+Platform-Specific AI Nodes: Generate tailored posts for each platform
+
+Merge Node: Combines all outputs into a single object
+
+Airtable Save Node: Stores final content permanently
+
+Respond to Webhook: Sends structured response back to frontend
+
+**🧪 Data Normalization Strategy**
+
+To avoid fragile references like webhook item paths, all downstream nodes rely on:
+
+**$json.keyword**
+
+
+This approach improves:
+
+Workflow stability
+
+Debugging simplicity
+
+Long-term scalability
+
+**🔐 Security**
+
+Airtable accessed via Personal Access Tokens
+
+OpenAI API keys are securely stored in n8n credentials
+
+**⚙️ Customization & Extensibility**
+
+Prompt Control
+
+Modify AI prompts to change:
+
+Tone (formal, conversational, technical)
+
+Content type (educational, how-to, thought leadership)
+
+Structure (headings, paragraph length, CTAs)
+
+Company Profile
+
+Update brand details directly in Airtable:
+
+Company name
+
+Services
+
+Target audience
+
+Tone and positioning
+
+Geographic focus
+
+**All AI outputs automatically adapt to changes without modifying the workflow.**
+
+**Future Extensions**
+
+>Social media auto-publishing
+
+>CMS integration (WordPress, Webflow)
+
+>Approval and scheduling workflows
+
+>Analytics and usage tracking
+
+>Multi-language support
+
+**📈 Use Cases**
+
+SEO teams
+
+Content marketing agencies
+
+Consultants
+
+Founders building content engines
+
+**✅ Final Outcome**
+
+This project demonstrates a production-ready AI automation pipeline that transforms a single keyword into a complete, multi-platform content set with minimal human involvement.
